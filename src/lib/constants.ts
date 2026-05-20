@@ -26,3 +26,17 @@ export const SALE_STATUS_LABELS: Record<string, string> = {
   confirmed: 'Confirmada',
   cancelled: 'Cancelada',
 }
+
+export const CONSIGNMENT_STATUS_LABELS: Record<string, string> = {
+  aberto: 'Aberto',
+  parcial: 'Parcial',
+  atrasado: 'Atrasado',
+  fechado: 'Fechado',
+}
+
+export const COMMISSION_STATUS_LABELS: Record<string, string> = {
+  pending: 'Pendente',
+  approved: 'Aprovada',
+  paid: 'Paga',
+  cancelled: 'Cancelada',
+}

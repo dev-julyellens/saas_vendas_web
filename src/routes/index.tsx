@@ -30,6 +30,19 @@ const SettingsPage = lazy(() =>
 const SessionsPage = lazy(() =>
   import('@/modules/settings/pages/SessionsPage').then((m) => ({ default: m.SessionsPage })),
 )
+const ConsignmentsListPage = lazy(() =>
+  import('@/modules/consignments/pages/ConsignmentsListPage').then((m) => ({
+    default: m.ConsignmentsListPage,
+  })),
+)
+const ResellersListPage = lazy(() =>
+  import('@/modules/resellers/pages/ResellersListPage').then((m) => ({ default: m.ResellersListPage })),
+)
+const CommissionsListPage = lazy(() =>
+  import('@/modules/commissions/pages/CommissionsListPage').then((m) => ({
+    default: m.CommissionsListPage,
+  })),
+)
 const PlaceholderPage = lazy(() =>
   import('@/modules/shared/pages/PlaceholderPage').then((m) => ({ default: m.PlaceholderPage })),
 )
@@ -68,24 +81,22 @@ export const router = createBrowserRouter([
             children: [{ path: ROUTES.products, element: <Lazy><ProductsListPage /></Lazy> }],
           },
           {
-            path: ROUTES.consignments,
-            element: (
-              <Lazy>
-                <PlaceholderPage title="Consignações" description="Gestão de remessas consignadas" />
-              </Lazy>
-            ),
+            element: <PermissionGuard permissions={['consignment.view', 'consignment.manage']} />,
+            children: [
+              { path: ROUTES.consignments, element: <Lazy><ConsignmentsListPage /></Lazy> },
+            ],
           },
           {
             path: ROUTES.customers,
             element: <Lazy><PlaceholderPage title="Clientes" /></Lazy>,
           },
           {
-            path: ROUTES.resellers,
-            element: <Lazy><PlaceholderPage title="Revendedores" /></Lazy>,
+            element: <PermissionGuard permission="resellers.manage" />,
+            children: [{ path: ROUTES.resellers, element: <Lazy><ResellersListPage /></Lazy> }],
           },
           {
-            path: ROUTES.commissions,
-            element: <Lazy><PlaceholderPage title="Comissões" /></Lazy>,
+            element: <PermissionGuard permission="commissions.manage" />,
+            children: [{ path: ROUTES.commissions, element: <Lazy><CommissionsListPage /></Lazy> }],
           },
           {
             path: ROUTES.financial,

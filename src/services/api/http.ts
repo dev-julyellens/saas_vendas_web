@@ -16,6 +16,11 @@ export async function put<T>(url: string, body?: unknown) {
   return data
 }
 
+export async function patch<T>(url: string, body?: unknown) {
+  const { data } = await apiClient.patch<ApiSuccessResponse<T>>(url, body)
+  return data
+}
+
 export async function del<T>(url: string) {
   const { data } = await apiClient.delete<ApiSuccessResponse<T>>(url)
   return data

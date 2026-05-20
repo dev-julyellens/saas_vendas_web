@@ -1,0 +1,6 @@
+.env
+.env.staging
+.env.production
+.env.*.local
+docker/nginx/ssl/*.pem
+!docker/nginx/ssl/.gitkeep

@@ -1,0 +1,77 @@
+# Overrides — produção
+# Uso: docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.production up -d
+services:
+  gateway:
+    restart: always
+    volumes:
+      - ./docker/nginx/gateway.prod.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./docker/nginx/proxy_params.conf:/etc/nginx/proxy_params.conf:ro
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+
+  api:
+    build:
+      target: production
+    restart: always
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      LOG_LEVEL: warning
+      APP_KEY: ${APP_KEY}
+      JWT_SECRET: ${JWT_SECRET}
+    volumes:
+      - api_storage:/var/www/html/storage
+      - ./docker/php/php.prod.ini:/usr/local/etc/php/conf.d/99-saas.ini:ro
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 512M
+
+  api-nginx:
+    restart: always
+
+  postgres:
+    restart: always
+    ports: []
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  redis:
+    restart: always
+    ports: []
+    command: >
+      sh -c "redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+      ${REDIS_PASSWORD:+--requirepass $REDIS_PASSWORD}"
+
+  queue:
+    build:
+      target: production
+    restart: always
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+    volumes:
+      - api_storage:/var/www/html/storage
+    # Escalar: ./scripts/scale-queue.sh 4
+
+  scheduler:
+    build:
+      target: production
+    restart: always
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+    volumes:
+      - api_storage:/var/www/html/storage
+
+  backup:
+    profiles: []
+    restart: always
+
+  web:
+    restart: always

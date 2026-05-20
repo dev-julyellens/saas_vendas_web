@@ -1,0 +1,51 @@
+# Overrides — ambiente staging
+# Uso: docker compose -f docker-compose.yml -f docker-compose.staging.yml --env-file .env.staging up -d
+services:
+  gateway:
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+    volumes:
+      - ./docker/nginx/gateway.staging.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./docker/nginx/proxy_params.conf:/etc/nginx/proxy_params.conf:ro
+
+  api:
+    build:
+      target: production
+    environment:
+      APP_ENV: staging
+      APP_DEBUG: "false"
+      LOG_LEVEL: info
+      APP_KEY: ${APP_KEY}
+      JWT_SECRET: ${JWT_SECRET}
+    volumes:
+      - api_storage:/var/www/html/storage
+      - ./docker/php/php.prod.ini:/usr/local/etc/php/conf.d/99-saas.ini:ro
+
+  queue:
+    build:
+      target: production
+    environment:
+      APP_ENV: staging
+      APP_DEBUG: "false"
+    volumes:
+      - api_storage:/var/www/html/storage
+
+  scheduler:
+    build:
+      target: production
+    environment:
+      APP_ENV: staging
+      APP_DEBUG: "false"
+    volumes:
+      - api_storage:/var/www/html/storage
+
+  postgres:
+    ports: []
+
+  redis:
+    ports: []
+
+  web:
+    build:
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
